@@ -3,64 +3,34 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
-
     <title>Seamer</title>
   </head>
   <body class="py-5">
     <div class="container">
       <h1>Seamer</h1>
       <p class="lead">Seam carving tool</p>
-      <p>This tool implements seam carving as proposed in the paper.</p>
-      <img id="imageSrc" alt="No Image" hidden/>
-      <p>
-        <div class="custom-file">
-          <input type="file" class="custom-file-input" id="fileInput" required>
-          <label class="custom-file-label" for="fileInput">Choose file...</label>
+      <p>This tool implements seam carving as proposed in the <a href="https://faculty.idc.ac.il/arik/SCWeb/imret/index.html">original paper</a>.</p>
+      <p class="row">
+        <div class="col-4">
+          <div class="custom-file">
+            <input type="file" class="custom-file-input" id="fileInput" required>
+            <label class="custom-file-label" for="fileInput">Choose file...</label>
+          </div>
         </div>
       </p>
+      <div class="spinner-border align-middle" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
       <canvas id="imageCanvas"></canvas>
     </div>
 
+    <img id="imageSrc" alt="No Image" hidden/>
+
     <script src="scripts/seamcarving.js"></script>
     <script src="scripts/priority-queue.js"></script>
-    <script type="text/javascript">
-      let imgElement = document.getElementById('imageSrc');
-      let inputElement = document.getElementById('fileInput');
-      inputElement.onchange = function() {
-        imgElement.src = URL.createObjectURL(event.target.files[0]);
-      };
+    <script src="scripts/main.js"></script>
 
-      imgElement.onload = function() {
-        let image = cv.imread(imgElement);
-        let gray = new cv.Mat(image.rows, image.cols, cv.CV_16S);
-        let sobelx = gray.clone();
-        let sobely = gray.clone();
-        let xabs = gray.clone()
-        let yabs = gray.clone()
-        let energy = gray.clone();
-        cv.cvtColor(image, gray, cv.COLOR_RGBA2GRAY);
-        cv.Sobel(gray, sobelx, cv.CV_16S, 1, 0, 5);
-        cv.Sobel(gray, sobely, cv.CV_16S, 0, 1, 5);
-        cv.convertScaleAbs(sobelx, xabs);
-        cv.convertScaleAbs(sobely, yabs);
-        cv.addWeighted(xabs, 0.5, yabs, 0.5, 0, energy);
-        cv.imshow('imageCanvas', energy);
-
-        image.delete();
-        gray.delete();
-        sobelx.delete();
-        sobely.delete();
-      };
-    </script>
-    <script type="text/javascript">
-      document.querySelector('.custom-file-input').addEventListener('change',function(e){
-        let fileName = document.getElementById("fileInput").files[0].name;
-        let nextSibling = e.target.nextElementSibling;
-        nextSibling.innerText = fileName;
-      })
-    </script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
   </body>
