@@ -7,5 +7,5 @@ function findSeam(energy){
         cost.data[i] = 255;
     }
     let queue = new PriorityQueue();
-    queue.enqueue(-1, 0);
+    queue.queue(-1, 0);
 }
