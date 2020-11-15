@@ -21,7 +21,9 @@ function seamCarve() {
         image.data[x * cols * 4 + col * 4 + 2] = 0;   // B
         image.data[x * cols * 4 + col * 4 + 3] = 255; // A
     }
-    cv.imshow('imageCanvas', image);
+    if (seamOn.checked) {
+        cv.imshow('imageCanvas', image);
+    }
 
     ima = new cv.Mat(rows, cols - 1, cv.CV_8UC4);
     gray = new cv.Mat(rows, cols - 1, cv.CV_8U);
@@ -41,6 +43,9 @@ function seamCarve() {
                 gray.data[x * gray.cols + col] = grayTemp.data[x * grayTemp.cols + y];
             }
         }
+    }
+    if (!seamOn.checked) {
+        cv.imshow('imageCanvas', ima);
     }
 
     image.delete();
