@@ -5,20 +5,15 @@ let gray;
 let openCvReady = false;
 
 function onOpenCvReady() {
-  cv['onRuntimeInitialized']=()=>{
-    openCvReady = true;
-    document.getElementById('input').hidden = false;
-    document.getElementById('carver').hidden = false;
-  };
-}
-
-window.onload = function () {
-    if (openCvReady) {
+    cv['onRuntimeInitialized']=()=>{
+        openCvReady = true;
+        document.getElementById('input').hidden = false;
+        document.getElementById('carver').hidden = false;
         ima = cv.imread(imgElement);
         cv.imshow("imageCanvas", ima);
         gray = new cv.Mat(ima.rows, ima.cols, cv.CV_8U);
         cv.cvtColor(ima, gray, cv.COLOR_RGBA2GRAY);
-    }
+    };
 }
 
 inputElement.onchange = function() {
