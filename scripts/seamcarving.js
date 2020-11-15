@@ -54,7 +54,6 @@ function seamCarve() {
 
 function findSeam(energy){
     // DAG shortest path
-    let t0 = performance.now();
     let rows = energy.rows;
     let cols = energy.cols;
     let cost = new Int16Array(rows * cols);
@@ -66,7 +65,6 @@ function findSeam(energy){
         cost[i] = 32767;
     }
 
-    let t1 = performance.now();
     // Row by row update 3 pixels right below
     let cur_index = 0;
     for (let x = 0; x < rows - 1; x++) {
@@ -83,7 +81,6 @@ function findSeam(energy){
         }
     }
 
-    let t2 = performance.now();
     // Backtracing
     let final_cost = 32767;
     let final_col = -1;
@@ -100,6 +97,5 @@ function findSeam(energy){
         result[x - 1] = prev[x * cols + result[x]];
     }
 
-    let t3 = performance.now();
     return result;
 }

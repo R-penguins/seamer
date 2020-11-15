@@ -21,14 +21,12 @@ inputElement.onchange = function() {
 };
 
 imgElement.onload = function() {
-    if (openCvReady) {
-        ima = cv.imread(imgElement);
-        cv.imshow("imageCanvas", ima);
-        ima = cv.imread(imgElement);
-        cv.imshow("imageCanvas", ima);
-        gray = new cv.Mat(ima.rows, ima.cols, cv.CV_8U);
-        cv.cvtColor(ima, gray, cv.COLOR_RGBA2GRAY);
-    }
+    ima = cv.imread(imgElement);
+    cv.imshow("imageCanvas", ima);
+    ima = cv.imread(imgElement);
+    cv.imshow("imageCanvas", ima);
+    gray = new cv.Mat(ima.rows, ima.cols, cv.CV_8U);
+    cv.cvtColor(ima, gray, cv.COLOR_RGBA2GRAY);
 }
 
 // Write file name in file selector
