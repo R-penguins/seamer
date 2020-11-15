@@ -5,9 +5,11 @@ let gray;
 let openCvReady = false;
 
 function onOpenCvReady() {
+  cv['onRuntimeInitialized']=()=>{
     openCvReady = true;
     document.getElementById('input').hidden = false;
     document.getElementById('carver').hidden = false;
+  };
 }
 
 window.onload = function () {
