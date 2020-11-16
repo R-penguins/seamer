@@ -1,28 +1,47 @@
-function seamCarve() {
-    let image = ima.clone();
-    let grayTemp = gray.clone();
-    let rows = image.rows;
-    let cols = image.cols;
+function getEnergy() {
+    let rows = gray.rows;
+    let cols = gray.cols;
     let sobelx = new cv.Mat(rows, cols, cv.CV_16S);
     let sobely = new cv.Mat(rows, cols, cv.CV_16S);
     let xabs = new cv.Mat(rows, cols, cv.CV_16S);
     let yabs = new cv.Mat(rows, cols, cv.CV_16S);
     let energy = new cv.Mat(rows, cols, cv.CV_16S);
-    cv.Sobel(grayTemp, sobelx, cv.CV_16S, 1, 0, 3);
-    cv.Sobel(grayTemp, sobely, cv.CV_16S, 0, 1, 3);
+    cv.Sobel(gray, sobelx, cv.CV_16S, 1, 0, 3);
+    cv.Sobel(gray, sobely, cv.CV_16S, 0, 1, 3);
     cv.convertScaleAbs(sobelx, xabs);
     cv.convertScaleAbs(sobely, yabs);
     cv.addWeighted(xabs, 0.5, yabs, 0.5, 0, energy);
-    let seam = findSeam(energy);
+
+    xabs.delete();
+    yabs.delete();
+    sobelx.delete();
+    sobely.delete();
+
+    return energy;
+}
+
+function seamCarve() {
+    let rows = gray.rows;
+    let cols = gray.cols;
+    let image = ima.clone();
+    let grayTemp = gray.clone();
+    let seam = findSeam();
     for (let x = 0; x < image.rows; x++) {
         let col = seam[x];
         image.data[x * cols * 4 + col * 4    ] = 255; // R
         image.data[x * cols * 4 + col * 4 + 1] = 0;   // G
         image.data[x * cols * 4 + col * 4 + 2] = 0;   // B
         image.data[x * cols * 4 + col * 4 + 3] = 255; // A
+
+        energy.data[x * cols + col] = 255;
     }
     if (seamOn.checked) {
-        cv.imshow('imageCanvas', image);
+        if (gradientOn.checked) {
+            cv.imshow('imageCanvas', energy);
+        }
+        else {
+            cv.imshow('imageCanvas', image);
+        }
     }
 
     ima = new cv.Mat(rows, cols - 1, cv.CV_8UC4);
@@ -44,20 +63,21 @@ function seamCarve() {
             }
         }
     }
+    energy = getEnergy();
     if (!seamOn.checked) {
-        cv.imshow('imageCanvas', ima);
+        if (gradientOn.checked) {
+            cv.imshow('imageCanvas', energy);
+        }
+        else {
+            cv.imshow('imageCanvas', ima);
+        }
     }
 
     image.delete();
-    energy.delete();
     grayTemp.delete();
-    xabs.delete();
-    yabs.delete();
-    sobelx.delete();
-    sobely.delete();
 }
 
-function findSeam(energy){
+function findSeam(){
     // DAG shortest path
     let rows = energy.rows;
     let cols = energy.cols;

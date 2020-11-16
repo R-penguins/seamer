@@ -1,21 +1,33 @@
 let imgElement = document.getElementById('imageSrc');
 let inputElement = document.getElementById('fileInput');
 let seamOn = document.getElementById('seamSwitch');
+let gradientOn = document.getElementById('gradientSwitch');
 let ima;
+let ori_ima;
 let gray;
+let ori_gray;
+let energy;
 let openCvReady = false;
+let sliderVal = 100;
+let slider = new Slider('#ratioSlider', {
+	formatter: function(value) {
+		return value + '%';
+	}
+});
 
 function onOpenCvReady() {
     cv['onRuntimeInitialized']=()=>{
         openCvReady = true;
         document.getElementById('input').hidden = false;
-        document.getElementById('carver').hidden = false;
+        document.getElementById('ratioSlider').hidden = false;
         document.getElementById('seamCheckbox').hidden = false;
+        document.getElementById('gradientCheckbox').hidden = false;
         document.getElementById('spinner').hidden = true;
         ima = cv.imread(imgElement);
         cv.imshow("imageCanvas", ima);
         gray = new cv.Mat(ima.rows, ima.cols, cv.CV_8U);
         cv.cvtColor(ima, gray, cv.COLOR_RGBA2GRAY);
+        energy = getEnergy();
     };
 }
 
@@ -26,25 +38,37 @@ inputElement.onchange = function() {
 imgElement.onload = function() {
     ima = cv.imread(imgElement);
     cv.imshow("imageCanvas", ima);
-    ima = cv.imread(imgElement);
-    cv.imshow("imageCanvas", ima);
+    ori_ima = ima.clone();
     gray = new cv.Mat(ima.rows, ima.cols, cv.CV_8U);
+    ori_gray = gray.clone();
     cv.cvtColor(ima, gray, cv.COLOR_RGBA2GRAY);
+    energy = getEnergy();
 }
 
-function carve () {
-    for (let i = 0; i < 10; i++) {
+function reset() {
+    ima = ori_ima.clone();
+    cv.imshow("imageCanvas", ima);
+    slider.refresh();
+    gray = ori_gray.clone();
+    energy = getEnergy();
+}
+
+/**
+ * Carve out specified number of seams.
+ * @param {number} num Number of seams to cut out.
+ */
+function carve (num) {
+    for (let i = 0; i < num; i++) {
         window.setTimeout(seamCarve);
     }
 }
 
-$('#ex1').slider({
-	formatter: function(value) {
-		return 'Current value: ' + value;
-	}
+slider.on('slideStop', function(curValue) {
+    slider.disable();
+    carve((sliderVal - curValue) * ima.cols / 100);
+    sliderVal = curValue;
+    slider.enable();
 });
-
-var mySlider = $("input.slider").bootstrapSlider();
 
 // Write file name in file selector
 document.querySelector('.custom-file-input').addEventListener('change',function(e){
