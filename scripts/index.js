@@ -75,6 +75,12 @@ function carve (num) {
 
 slider.on('slideStop', function(curValue) {
     slider.disable();
+    if (curValue > sliderVal && sliderVal < 100) {
+        ima = ori_ima.clone();
+        gray = ori_gray.clone();
+        energy = getEnergy();
+        sliderVal = 100;
+    }
     carve((sliderVal - curValue) * ima.cols / 100);
     sliderVal = curValue;
     slider.enable();
