@@ -25,8 +25,10 @@ function onOpenCvReady() {
         document.getElementById('spinner').hidden = true;
         ima = cv.imread(imgElement);
         cv.imshow("imageCanvas", ima);
+        ori_ima = ima.clone();
         gray = new cv.Mat(ima.rows, ima.cols, cv.CV_8U);
         cv.cvtColor(ima, gray, cv.COLOR_RGBA2GRAY);
+        ori_gray = gray.clone();
         energy = getEnergy();
     };
 }
@@ -40,8 +42,8 @@ imgElement.onload = function() {
     cv.imshow("imageCanvas", ima);
     ori_ima = ima.clone();
     gray = new cv.Mat(ima.rows, ima.cols, cv.CV_8U);
-    ori_gray = gray.clone();
     cv.cvtColor(ima, gray, cv.COLOR_RGBA2GRAY);
+    ori_gray = gray.clone();
     energy = getEnergy();
 }
 
@@ -51,6 +53,7 @@ function reset() {
     slider.refresh();
     gray = ori_gray.clone();
     energy = getEnergy();
+    sliderVal = 100;
 }
 
 /**
@@ -58,8 +61,15 @@ function reset() {
  * @param {number} num Number of seams to cut out.
  */
 function carve (num) {
-    for (let i = 0; i < num; i++) {
-        window.setTimeout(seamCarve);
+    if (num > 0) {
+        for (let i = 0; i < num; i++) {
+            window.setTimeout(seamCarve);
+        }
+    }
+    else {
+        for (let i = 0; i < -num; i++) {
+            window.setTimeout(seamCarveEnlarge);
+        }
     }
 }
 

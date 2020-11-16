@@ -77,6 +77,63 @@ function seamCarve() {
     grayTemp.delete();
 }
 
+function seamCarveEnlarge() {
+    let rows = gray.rows;
+    let cols = gray.cols;
+    let image = ima.clone();
+    let grayTemp = gray.clone();
+    let seam = findSeam();
+
+    ima = new cv.Mat(rows, cols + 1, cv.CV_8UC4);
+    gray = new cv.Mat(rows, cols + 1, cv.CV_8U);
+    for (let x = 0; x < rows; x++) {
+        let dcol = seam[x];
+        for (let y = 0; y < ima.cols; y++) {
+            let col = y;
+            if (y >= dcol + 1) {
+                col--;
+            }
+            ima.data[x * ima.cols * 4 + y * 4    ] = image.data[x * image.cols * 4 + col * 4    ];
+            ima.data[x * ima.cols * 4 + y * 4 + 1] = image.data[x * image.cols * 4 + col * 4 + 1];
+            ima.data[x * ima.cols * 4 + y * 4 + 2] = image.data[x * image.cols * 4 + col * 4 + 2];
+            ima.data[x * ima.cols * 4 + y * 4 + 3] = image.data[x * image.cols * 4 + col * 4 + 3];
+
+            gray.data[x * gray.cols + y] = grayTemp.data[x * grayTemp.cols + col];
+        }
+    }
+    energy = getEnergy();
+    if (!seamOn.checked) {
+        if (gradientOn.checked) {
+            cv.imshow('imageCanvas', energy);
+        }
+        else {
+            cv.imshow('imageCanvas', ima);
+        }
+    }
+    if (seamOn.checked) {
+        let energyTemp = energy.clone();
+        for (let x = 0; x < image.rows; x++) {
+            let col = seam[x];
+            image.data[x * cols * 4 + col * 4    ] = 255; // R
+            image.data[x * cols * 4 + col * 4 + 1] = 0;   // G
+            image.data[x * cols * 4 + col * 4 + 2] = 0;   // B
+            image.data[x * cols * 4 + col * 4 + 3] = 255; // A
+
+            energyTemp.data[x * energyTemp.cols + col] = 255;
+        }         
+        if (gradientOn.checked) {
+            cv.imshow('imageCanvas', energyTemp);
+        }                                  
+        else {                             
+            cv.imshow('imageCanvas', image);
+        }                                 
+        energyTemp.delete();
+    }                                     
+                                          
+    image.delete();
+    grayTemp.delete();
+}
+
 function findSeam(){
     // DAG shortest path
     let rows = energy.rows;
